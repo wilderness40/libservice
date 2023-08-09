@@ -45,10 +45,24 @@ router.post('/login', expressAsyncHandler(async (req, res, next) => {
         })
     }
 }))
-router.put('/:id ', (req, res, next) => { // 사용자정보 수정
-    res.json('사용자정보 수정')
-})
-router.delete('/:id ', (req, res, next) => { // 회원탈퇴 처리
+router.put('/:id', isAuth, expressAsyncHandler(async(req, res, next) => {
+    const user = await User.findById(req.params.id)
+    if(!user){
+        res.status(404).json({ code: 404, message: '사용자가 존재하지 않습니다'})
+    }else{
+        user.name = req.body.name || user.name
+        user.phone = req.body.phone || user.phone
+        user.password = req.body.password || user.password
+        const updatedUser = await user.save()
+        const { name, phone, userId, isAdmin, createdAt } = updatedUser
+        res.json({
+            code: 200,
+            token: generateToken(updatedUser),
+            name, phone, userId, isAdmin, createdAt
+        })
+    }
+}))
+router.delete('/:id', (req, res, next) => { // 회원탈퇴 처리
     res.json('회원탈퇴 처리')
 })
 
