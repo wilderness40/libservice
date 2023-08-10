@@ -57,6 +57,6 @@ app.use((err, req, res, next) => { // 서버 내부 오류 처리
     console.error(err.stack)
     res.status(500).send('서버에 문제가 발생하였습니다.')
 })
-app.listen(3000, () => { /* 서버실행 */
-    console.log('Now listening on port 3000')
+app.listen(4000, () => { /* 서버실행 */
+    console.log('Now listening on port 4000')
 })

@@ -46,13 +46,17 @@ router.post('/login', expressAsyncHandler(async (req, res, next) => {
     }
 }))
 router.put('/:id', isAuth, expressAsyncHandler(async(req, res, next) => {
-    const user = await User.findById(req.params.id)
+    console.log(req.body)
+    const user = await User.findById(req.params.id) 
     if(!user){
         res.status(404).json({ code: 404, message: '사용자가 존재하지 않습니다'})
     }else{
         user.name = req.body.name || user.name
         user.phone = req.body.phone || user.phone
         user.password = req.body.password || user.password
+        user.isAdmin = req.body.isAdmin || user.isAdmin
+        user.lastModifiedAt = new Date()
+        
         const updatedUser = await user.save()
         const { name, phone, userId, isAdmin, createdAt } = updatedUser
         res.json({
@@ -62,8 +66,13 @@ router.put('/:id', isAuth, expressAsyncHandler(async(req, res, next) => {
         })
     }
 }))
-router.delete('/:id', (req, res, next) => { // 회원탈퇴 처리
-    res.json('회원탈퇴 처리')
-})
+router.delete('/:id', isAuth, expressAsyncHandler(async(req, res, next) => {
+    const user = await User.findByIdAndDelete(req.params.id)
+    if(!user){
+        res.status(404).json({ code: 404, message: '사용자가 존재하지 않습니다'})
+    }else{
+        res.status(204).json({ code:204, message: '사용자 정보가 삭제되었습니다.'})
+    }
+}))
 
 module.exports = router

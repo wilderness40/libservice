@@ -18,6 +18,11 @@ const booksSchema = new Schema({
         type: String,
         trim: true,
     },
+    imgUrl: {
+        type: String,
+        required: true,
+        trim: true,
+    },
     standardNum: {
         type: Number,
     },

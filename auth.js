@@ -25,16 +25,17 @@ const isAuth = (req, res, next) => { // 권한확인
         res.status(401).json({ message: '토큰이 없습니다' }) // 헤더에 토큰이 없는 경우
     }else{
         const token = bearerToken.slice(7, bearerToken.length) // header authorization에서 bearer 글자 제거, 토큰만 추출
+        jwt.verify(token, config.JWT_SECRET, (err, userInfo) => {
+            if(err && err.name == 'TokenExpiredError'){ // 토큰만료
+                res.status(419).json({ code: 419, message: '토큰이 만료되었습니다'})
+            }else if(err){
+                res.status(401).json({ code: 401, message: '유효한 토큰이 아닙니다'})
+            }else{
+                req.user = userInfo
+                next()
+            }
+        })
     }
-    jwt.verify(token, config.JWT_SECRET, (err, userInfo) => {
-        if(err && err.name == 'TokenExpiredError'){ // 토큰만료
-            res.status(419).json({ code: 419, message: '토큰이 만료되었습니다'})
-        }else if(err){
-            res.status(401).json({ code: 401, message: '유효한 토큰이 아닙니다'})
-        }
-        req.user = userInfo
-        next()
-    })
 }
 
 /* 사용자 권한이 있는 사용자의 경우 */
